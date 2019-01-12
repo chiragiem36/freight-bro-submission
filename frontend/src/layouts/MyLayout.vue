@@ -2,32 +2,12 @@
   <q-layout class="text-center">
     <template v-if="!authenticating">
       <q-page-container v-if="authenticated && loaded">
-        <div class="row bg-white items-center justify-around" style="height: 40px; border-bottom: solid 1px rgb(190, 190, 190)">
+        <div class="row bg-white items-center justify-around" style="height: 50px; border-bottom: solid 1px rgb(190, 190, 190)">
           <span class="col-xs-1 text-left" style="padding-left: 5px">
-            <q-btn icon="list" dense rounded flat @click="left = !left" />
+            <q-btn icon="add" label="new" color="orange-7" inverted @click="addNew" />
           </span>
-          <div class="col-xl-4 col-lg-4 col-md-5 col-sm-6 text-left" v-if="$q.platform.is.desktop">
-            <q-btn flat style="margin-bottom: 1px; margin-right: 2px" color="grey-7" @click.native="$router.go(-1)">
-               <q-item-side color="red" icon="keyboard_return" />
-               <q-item-main v-if="width > 800" label="back" />
-             </q-btn>
-             <q-btn flat style="margin-bottom: 1px" color="grey-7" @click.native="$router.go(1)">
-               <q-item-main v-if="width > 800" label="forward" />
-               <q-item-side color="secondary" icon="arrow_forward " />
-             </q-btn>
-          </div>
           <div class="col-xl-4 col-lg-4 col-md-4 col-sm-4 col-xs-6 text-left">
-            {{ store.school }} | {{ 'Admin' }}
-          </div>
-          <div class="col-xl-1 col-lg-2 col-md-2 col-sm-3 col-xs-4 text-right">
-            <q-btn icon="notifications" color="grey-10" size="18px" @click="popovers.notif = !popovers.notif" disabled flat>
-              <q-popover v-model="popovers.notif" anchor="bottom left" self="top left" style="width: 250px;" ref="popover">
-                <p class="row text-center text-grey-6 items-center" style="height: 300px; margin-top: 5px">
-                  <span class="col-xs-10 offset-1">no new notifications</span>
-                </p>
-              </q-popover>
-            </q-btn>
-            <q-btn color="red-10" icon="settings power" size="18px" @click="logout" flat></q-btn>
+            Freight Bro | {{ 'Admin' }}
           </div>
         </div>
         <div class="row" style="overflow-y: auto" :style="{height}">
@@ -160,7 +140,7 @@ export default {
       return this.store.comp
     },
     authenticated () {
-      return this.store.authenticated || false
+      return this.store.authenticated || true
     },
     updates () {
       if (this.store.updates && Object.keys(this.store.updates).length > 0) {
@@ -170,7 +150,7 @@ export default {
       }
     },
     height () {
-      return window.innerHeight - 40 + 'px'
+      return window.innerHeight - 50 + 'px'
     },
     load () {
       return this.loaded
