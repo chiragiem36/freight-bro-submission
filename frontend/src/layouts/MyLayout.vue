@@ -3,8 +3,16 @@
     <template v-if="!authenticating">
       <q-page-container v-if="authenticated && loaded">
         <div class="row bg-white items-center justify-around" style="height: 50px; border-bottom: solid 1px rgb(190, 190, 190)">
-          <span class="col-xs-1 text-left" style="padding-left: 5px">
-            <q-btn icon="add" label="new" color="orange-7" inverted @click="addNew" />
+          <span class="col-xs-3 text-left" style="padding-left: 5px">
+            <q-btn icon="add" label="new project" color="orange-7" inverted @click="$router.push('/projects/new')" />
+            <q-btn v-if="$route.name === 'api-list'" style="margin-left: 5px" icon="add" label="new api" color="primary" inverted @click="popover = true" />
+            <q-popover self="center right" class="text-center text-grey-9" v-model="popover" ref="newPopover" style="width: 200px;">
+              <q-list>
+                <q-item :key="project._id" v-for="project in store.projects" @click.native="$router.push('/projects/id=' + project._id + '/new')" flat style="width: 100%; cursor: pointer">
+                  <q-icon name="person add " /> {{project.name}}
+                </q-item>
+              </q-list>
+            </q-popover>
           </span>
           <div class="col-xl-4 col-lg-4 col-md-4 col-sm-4 col-xs-6 text-left">
             Freight Bro | {{ 'Admin' }}
@@ -94,6 +102,7 @@ export default {
   },
   data () {
     return {
+      popover: false,
       authenticating: false,
       left: true,
       FSR: true,
@@ -106,9 +115,6 @@ export default {
       loaded: true,
       modal: {
         newFaculty: true
-      },
-      popover: {
-        'addNew': false
       }
     }
   },
@@ -140,7 +146,7 @@ export default {
       return this.store.comp
     },
     authenticated () {
-      return this.store.authenticated || true
+      return this.store.authenticated
     },
     updates () {
       if (this.store.updates && Object.keys(this.store.updates).length > 0) {
@@ -160,6 +166,11 @@ export default {
     }
   },
   watch: {
+    authenticated () {
+      if (this.authenticated) {
+        this.getProjects()
+      }
+    },
     '$route.path' (to, from) {
       if (to === "/") {
         // this.getDepartmentData()
@@ -172,10 +183,39 @@ export default {
     }
   },
   created () {
-
     // this.$q.loading.show()
+    this.getProjects()
   },
-  methods: {}
+  methods: {
+    getProjects () {
+      
+      this.authenticating = true
+
+      this.$http.get('/list/projects')
+      .then((res) => {
+        if (res.status === 200 || res.status === 304) {
+          
+          this.$store.commit('user/setObj', {
+            authenticated: true,
+          })
+
+          this.$store.commit('user/setObj', res.body)
+        }
+      })
+      .catch((err) => {
+        console.log(err)
+        if (err.status === 401) {
+          this.$store.commit('user/setObj', {
+            authenticated: false
+          })
+        }
+      })
+      .then(() => {
+        this.authenticating = false
+      })
+    },
+    addNew () {}
+  }
 }
 </script>
 
@@ -267,7 +307,7 @@ export default {
   }
 
   .q-input, .q-select, .q-toggle {
-    padding: 10px 10px 10px 10px;
+    padding: 5px 5px 5px 5px;
     border: solid 1px rgb(180, 180, 180);
     border-radius: 3px;
     background-color: white;

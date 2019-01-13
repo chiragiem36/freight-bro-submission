@@ -3,23 +3,19 @@
     <div class="col-xs-12 col-sm-6 col-md-5 col-lg-4 col-xl-3 bg-white">
       <div id="input-box" class="row justify-center">
         <span class="col-xs-10">
-          <q-field icon="account circle" :error="error" :error-label="errorLabel">
+          <q-field icon="account circle" :error="errorUsername" :error-label="errorLabel">
             <q-input v-model="username" @keyup.enter="check" type="email" stack-label="Username" color="blue" autofocus />
           </q-field>
         </span>
         <span class="col-xs-10" style="margin-top: 20px">
-          <q-field icon="https" :error="error" :error-label="errorLabel">
-            <q-input v-model="password" @keyup.enter="check" type="email" stack-label="Password" color="blue" autofocus />
+          <q-field icon="https" :error="errorPassowrd" :error-label="errorLabel">
+            <q-input v-model="password" @keyup.enter="check" type="password" stack-label="Password" color="blue" autofocus />
           </q-field>
         </span>
         <div class="col-xs-12" style="margin-top: 20px; padding-bottom: 60px">
-          <div class="row">
-            <div class="col-xs-5 offset-xs-1 text-primary text-left" style="font-size: 14px; cursor: pointer" @click="$router.push('/register')">
-              Create account
-            </div>
-            <div class="text-center col-xs-6">
-              <q-btn color="primary" @click="check"><span style="color:white; font-size: 14px">Next</span></q-btn>
-            </div>
+          <div class="row justify-around">
+              <q-btn color="negative" @click="check('new-user')"><span style="color:white; font-size: 14px">Create Account</span></q-btn>
+              <q-btn color="primary" @click="check('login')"><span style="color:white; font-size: 14px">Log in</span></q-btn>
           </div>
         </div>
       </div>
@@ -29,11 +25,14 @@
 
 <script>
 
-import Username from './Username.vue'
+const crypto = require('crypto')
 
 export default {
   methods: {
-    check () {
+    alert (o) {
+      this.$q.notify(o)
+    },
+    check (path) {
       if (this.username.length < 5 ) {
         this.error = true
         this.errorLabel = 'Invalid Username'
@@ -45,34 +44,55 @@ export default {
 
         let level = 'admin'
 
-        this.$http.post('/login', {
-          body: {
-            name: this.username,
+        this.$http.post('/accounts/' + path, {
             level: level,
-            username: this.username,
-            password: this.password
-          }
-        }).then((res) => {
-          this.$store.commit('user/setObj', {
-            authenticated: true
-          })
-        }).catch((err) => {
-
-          if (err.status === 404) {
-            this.error = true
-            this.errorLabel = 'Couldnot find account with this username'
-            this.$q.loading.hide()
+            _id: this.username,
+            hash: crypto.createHash('md5').update(this.password).digest('hex')
+        })
+        .then((res) => {
+          if (path === 'login') {
+            if (res.status === 200) {
+              document.cookie = res.body.cookie
+              this.$store.commit('user/setObj', {
+                authenticated: true
+              })
+            }
           } else {
-            this.alert({message: "Internal Server Error", icon: 'error', position: 'top-right'})
+            if (res.status === 200) {
+              this.username = ""
+              this.password = ""
+            }
           }
-        }).then(() => {
+        })
+        .catch((err) => {
+
+          if (path === 'new-user') {
+            if (err.status === 401) {
+              this.errorUsername = true
+              this.errorLabel = 'Account already exist'
+            } else if (err.status === 404) {
+              this.errorPassowrd = true
+              this.errorLabel = 'User not found'
+            } else {
+              this.alert({message: "Internal Server Error", icon: 'error', position: 'top-right'})
+            }
+          } else {
+            if (err.status === 401) {
+              this.errorUsername = true
+              this.errorLabel = 'Account already exist'
+            } else if (err.status === 404) {
+              this.errorUsername = true
+              this.errorLabel = 'User not found'
+            } else {
+              this.alert({message: "Internal Server Error", icon: 'error', position: 'top-right'})
+            }
+          }
+        })
+        .then(() => {
           this.$q.loading.hide()
         })
       }
     }
-  },
-  components: {
-    Username
   },
   computed: {
     xx () {
@@ -95,9 +115,11 @@ export default {
   },
   data () {
     return {
-      comp: 'Username',
+      username: 'chiragiem36',
+      password: 'eenomoto',
       errorLabel: '',
-      error: false
+      errorUsername: false,
+      errorPassowrd: false
     }
   }
 }

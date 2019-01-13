@@ -30,6 +30,12 @@ module.exports = function (ctx) {
     devServer: {
       // https: true,
       // port: 8080,
+      proxy: {
+        '/': {
+          target: 'http://localhost',
+          changeOrigin: true
+        }
+      },
       open: true // opens browser window automatically
     },
     // framework: 'all' --- includes everything; for dev only!
@@ -51,7 +57,9 @@ module.exports = function (ctx) {
         'QItemSide',
         'QSpinner',
         'QInput',
-        'QField'
+        'QField',
+        'QPopover',
+        'QSelect'
       ],
       directives: [
         'Ripple'

@@ -9,8 +9,29 @@ const routes = [
         component: () => import('pages/Index.vue'),
         children: [
           {
-            path: '/projects/id=projectId',
-            component: () => import('pages/Project.vue')
+            path: 'projects/new',
+            component: () => import('components/NewProject.vue')
+          },
+          {
+            path: 'projects/id=:projectId',
+            name: 'api-list',
+            component: () => import('pages/Project.vue'),
+            children: [
+              {
+                path: 'api=:api/method=:method',
+                name: 'info',
+                components: {
+                  api: () => import('components/Api.vue')
+                }
+              },
+              {
+                path: 'new',
+                name: 'new',
+                components: {
+                  api: () => import('components/Api.vue')
+                }
+              }
+            ]
           }
         ]
       }

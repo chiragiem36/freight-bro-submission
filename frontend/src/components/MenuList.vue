@@ -13,10 +13,7 @@
           <q-list-header v-if="listData && listData.name && listData.name.length > 0">{{ listData.name }}</q-list-header>
           <q-item style="padding: 0px;" v-if="newBtn && !newBtn.float">
             <q-item-main>
-              <q-btn @click="$router.push(newBtn.to)" :icon="newBtn.icon ? newBtn.icon : ''" class="full-width" label="Add new staff" :color="newBtn.color ? newBtn.color : 'blue'" :flat="newBtn.flat ? newBtn.flat : false" :style="newBtn.style ? newBtn.style : ''">
-                <q-tooltip v-model="isTooltip">
-                  {{ newBtn.tooltip }}
-                </q-tooltip>
+              <q-btn @click="$router.push(newBtn.to)" :icon="newBtn.icon ? newBtn.icon : ''" class="full-width" :label="newBtn.label" :color="newBtn.color ? newBtn.color : 'blue'" :flat="newBtn.flat ? newBtn.flat : false" :style="newBtn.style ? newBtn.style : ''">
               </q-btn>
             </q-item-main>
 
