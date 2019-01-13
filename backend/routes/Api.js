@@ -23,7 +23,7 @@ Router.get('/*', (req, res) => {
 
 	collection('credits').findOne({_id: P[0]})
 	.then((credits) => {
-		if (credits && credits.get <= 0) {
+		if (!credits || credits.credits.get <= 0) {
 			throw Error("LIMIT_EXCEEDED")
 		} else {
 			return collection('apis').findOne({_id: _id})
@@ -64,6 +64,8 @@ Router.get('/*', (req, res) => {
 			res.send("\nUSERNAME IS NOT PRESENT IN HEADERS\n\n")
 		} else if (err.message === 'LIMIT_EXCEEDED') {
 			res.send("\nFREE_TIER LIMIT EXCEEDED\n\n")
+		} else if (err.message === 'UNAUTHORIZED') {
+			res.send("\nUNAUTHORIZED REQUEST\n\n")
 		} else {
 			res.send("\nINTERNAL SERVER ERROR\n\n")
 			res.status(500)
@@ -98,7 +100,7 @@ Router.post('/*', (req, res) => {
 
 	collection('credits').findOne({_id: P[0]})
 	.then((credits) => {
-		if (credits && credits.post <= 0) {
+		if (!credits || credits.credits.post <= 0) {
 			throw Error("LIMIT_EXCEEDED")
 		} else {
 			return collection('apis').findOne({_id: _id})
@@ -137,6 +139,10 @@ Router.post('/*', (req, res) => {
 			res.send("\nAUTH KEY NOT PROSENT IN HEADERS\n\n")
 		} else if (err.message === 'NO_USER_NAME') {
 			res.send("\nUSERNAME IS NOT PRESENT IN HEADERS\n\n")
+		} else if (err.message === 'LIMIT_EXCEEDED') {
+			res.send("\nFREE_TIER LIMIT EXCEEDED\n\n")
+		} else if (err.message === 'UNAUTHORIZED') {
+			res.send("\nUNAUTHORIZED REQUEST\n\n")
 		} else {
 			res.send("\nINTERNAL SERVER ERROR\n\n")
 			res.status(500)
@@ -171,7 +177,7 @@ Router.put('/*', (req, res) => {
 
 	collection('credits').findOne({_id: P[0]})
 	.then((credits) => {
-		if (credits && credits.put <= 0) {
+		if (!credits || credits.credits.put <= 0) {
 			throw Error("LIMIT_EXCEEDED")
 		} else {
 			return collection('apis').findOne({_id: _id})
@@ -210,6 +216,10 @@ Router.put('/*', (req, res) => {
 			res.send("\nAUTH KEY NOT PROSENT IN HEADERS\n\n")
 		} else if (err.message === 'NO_USER_NAME') {
 			res.send("\nUSERNAME IS NOT PRESENT IN HEADERS\n\n")
+		} else if (err.message === 'LIMIT_EXCEEDED') {
+			res.send("\nFREE_TIER LIMIT EXCEEDED\n\n")
+		} else if (err.message === 'UNAUTHORIZED') {
+			res.send("\nUNAUTHORIZED REQUEST\n\n")
 		} else {
 			res.send("\nINTERNAL SERVER ERROR\n\n")
 			res.status(500)
@@ -250,7 +260,7 @@ Router.delete('/*', (req, res) => {
 
 	collection('credits').findOne({_id: P[0]})
 	.then((credits) => {
-		if (credits.delete <= 0) {
+		if (!credits || credits.credits.delete <= 0) {
 			throw Error("LIMIT_EXCEEDED")
 		} else {
 			return collection('apis').findOne({_id: _id})
@@ -291,6 +301,10 @@ Router.delete('/*', (req, res) => {
 			res.send("\nusername IS NOT PRESENT IN HEADERS\n\n")
 		} else if (err.message === 'NO_DOCUMENT_ID') {
 			res.send("\ndocument_id IS NOT PRESENT IN HEADERS\n\n")
+		} else if (err.message === 'LIMIT_EXCEEDED') {
+			res.send("\nFREE_TIER LIMIT EXCEEDED\n\n")
+		} else if (err.message === 'UNAUTHORIZED') {
+			res.send("\nUNAUTHORIZED REQUEST\n\n")
 		} else {
 			res.send("\nINTERNAL SERVER ERROR\n\n")
 			res.status(500)
