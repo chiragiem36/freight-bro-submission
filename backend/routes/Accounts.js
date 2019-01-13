@@ -58,8 +58,11 @@ Router.post('/new-user', (req, res) => {
 		if (item && item._id) {
 			throw Error("USER_EXIST")
 		} else {
-			collection('users').insertOne(req.body)
+			return collection('users').insertOne(req.body)
 		}
+	})
+	.then(() => {
+		return collection('credits').insertOne({_id: req.body._id, credits: {'get': 5, post: 5, put: 5, delete: 5}})
 	})
 	.then(() => {
 		console.log("New user created - " + req.body._id)

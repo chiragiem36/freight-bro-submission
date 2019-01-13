@@ -21,22 +21,33 @@ Router.get('/*', (req, res) => {
 		throw Error("NO_USER_NAME")
 	}
 
-	console.log(_id)
-
-	collection('apis').findOne({_id: _id})
+	collection('credits').findOne({_id: P[0]})
+	.then((credits) => {
+		if (credits && credits.get <= 0) {
+			throw Error("LIMIT_EXCEEDED")
+		} else {
+			return collection('apis').findOne({_id: _id})
+		}
+	})
 	.then((item) => {
 		if (item && item._id) {
 			if (item.headers.authkey.indexOf(req.headers.authkey) === -1 && item.headers.authkey.indexOf('*') === -1) {
 				throw Error("UNAUTHORIZED")
 			} else {
-				res.setHeader('Content-type', item.response.type)
-				res.send('\n' + item.response.value + '\n\n')
-				res.status(200)
-				res.end()
+				return item
 			}
 		} else {
 			throw Error("CANNOT_GET")
 		}
+	})
+	.then((item) => {
+		res.setHeader('Content-type', item.response.type)
+		res.send('\n' + item.response.value + '\n\n')
+		res.status(200)
+		res.end()
+	})
+	.then(() => {
+		return collection('credits').updateOne({_id: P[0]}, {$inc: {'credits.get': -1}})
 	})
 	.catch((err) => {
 		console.error(err)
@@ -51,6 +62,8 @@ Router.get('/*', (req, res) => {
 			res.send("\nAUTH KEY NOT PROSENT IN HEADERS\n\n")
 		} else if (err.message === 'NO_USER_NAME') {
 			res.send("\nUSERNAME IS NOT PRESENT IN HEADERS\n\n")
+		} else if (err.message === 'LIMIT_EXCEEDED') {
+			res.send("\nFREE_TIER LIMIT EXCEEDED\n\n")
 		} else {
 			res.send("\nINTERNAL SERVER ERROR\n\n")
 			res.status(500)
@@ -83,9 +96,14 @@ Router.post('/*', (req, res) => {
 
 	let response
 
-	console.log(_id)
-
-	collection('apis').findOne({_id: _id})
+	collection('credits').findOne({_id: P[0]})
+	.then((credits) => {
+		if (credits && credits.post <= 0) {
+			throw Error("LIMIT_EXCEEDED")
+		} else {
+			return collection('apis').findOne({_id: _id})
+		}
+	})
 	.then((item) => {
 		if (item && item._id) {
 			if (item.headers.authkey.indexOf(req.headers.authkey) === -1 && item.headers.authkey.indexOf('*') === -1) {
@@ -102,6 +120,9 @@ Router.post('/*', (req, res) => {
 		res.send('\nData store Object ID - ' + data._id + '\n\n')
 		res.status(200)
 		res.end()
+	})
+	.then(() => {
+		return collection('credits').update({_id: P[0]}, {$inc: {'credits.post': -1}})
 	})
 	.catch((err) => {
 		console.error(err)
@@ -148,7 +169,14 @@ Router.put('/*', (req, res) => {
 
 	let response
 
-	collection('apis').findOne({_id: _id})
+	collection('credits').findOne({_id: P[0]})
+	.then((credits) => {
+		if (credits && credits.put <= 0) {
+			throw Error("LIMIT_EXCEEDED")
+		} else {
+			return collection('apis').findOne({_id: _id})
+		}
+	})
 	.then((item) => {
 		if (item && item._id) {
 			if (item.headers.authkey.indexOf(req.headers.authkey) === -1 && item.headers.authkey.indexOf('*') === -1) {
@@ -165,6 +193,9 @@ Router.put('/*', (req, res) => {
 		res.send('\nData store Object ID - ' + data._id + '\n\n')
 		res.status(200)
 		res.end()
+	})
+	.then(() => {
+		return collection('credits').update({_id: P[0]}, {$inc: {'credits.put': -1}})
 	})
 	.catch((err) => {
 		console.error(err)
@@ -217,7 +248,14 @@ Router.delete('/*', (req, res) => {
 
 	let response
 
-	collection('apis').findOne({_id: _id})
+	collection('credits').findOne({_id: P[0]})
+	.then((credits) => {
+		if (credits.delete <= 0) {
+			throw Error("LIMIT_EXCEEDED")
+		} else {
+			return collection('apis').findOne({_id: _id})
+		}
+	})
 	.then((item) => {
 		if (item && item._id) {
 			if (item.headers.authkey.indexOf(req.headers.authkey) === -1 && item.headers.authkey.indexOf('*') === -1) {
@@ -234,6 +272,9 @@ Router.delete('/*', (req, res) => {
 		res.send('\nDocument deleted ....  ID - ' + req.headers.document_id + '\n\n')
 		res.status(200)
 		res.end()
+	})
+	.then(() => {
+		return collection('credits').update({_id: P[0]}, {$inc: {'credits.delete': -1}})
 	})
 	.catch((err) => {
 		console.error(err)
