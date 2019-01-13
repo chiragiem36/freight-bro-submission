@@ -44,7 +44,7 @@ function main () {
   app.use('/list', Get)
   app.use('/project', Project)
 
-  app.use('/dist', express.static("dist",{
+  app.use('/dist', express.static("./../frontend/dist/spa-mat",{
     'maxAge': '604800'
   }))
 }
