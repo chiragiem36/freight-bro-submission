@@ -8,7 +8,7 @@ Router.get('/projects', (req, res) => {
 
 	console.log(id)
 
-	collection('users').find({_id: id})
+	collection('users').findOne({_id: id})
 	.then((user) => {
 		if (user && user._id) {
 			return collection('projects').find({creator: id}).toArray()

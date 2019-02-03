@@ -37,16 +37,16 @@ function main () {
   app.use(bp.text())
   app.use(bp.urlencoded({extended: true}))
   app.use(bp.json())
+
+  app.use('/dist', express.static("./../frontend/dist/spa-mat",{
+    'maxAge': '604800'
+  }))
   
   app.use('/api/', Handler)
   app.use('/accounts', Accounts)
   app.use('/', Authenticate)
   app.use('/list', Get)
   app.use('/project', Project)
-
-  app.use('/dist', express.static("./../frontend/dist/spa-mat",{
-    'maxAge': '604800'
-  }))
 }
 
 app.listen(process.env.PORT || port,function(){
